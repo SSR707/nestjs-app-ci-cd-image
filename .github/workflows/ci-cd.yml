@@ -28,7 +28,7 @@ jobs:
     steps:
        - name: Checkout repository
          uses: actions/checkout@v3
-         
+
        - name: Set up SSH key
          run: |
           env
@@ -42,7 +42,8 @@ jobs:
           ssh -v -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} <<'ENDSSH'
           docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_TOKEN}}
           docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:${{secrets.DOCKER_TAG}}
-          docker-compose down
-          docker-compose up --build -d
+          docker stop ${{secrets.CONTAINER}}
+          docker rm ${{secrets.CONTAINER}}
+          docker run -p 5005:3033 -d --name=${{secrets.CONTAINER}} ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:${{secrets.DOCKER_TAG}}
           docker logout ${{secrets.DOCKER_REPO}}
           ENDSSH
