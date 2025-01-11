@@ -46,7 +46,7 @@ jobs:
           docker stop ${{secrets.CONTAINER}}
           docker rm ${{secrets.CONTAINER}}
           docker rm super-db 
-          docker run --name super-db -e POSTGRES_USER=${PG_USER} -e POSTGRES_PASSWORD=${PG_PASSWORD} -e POSTGRES_DB=${PG_DATABASE} -p 5433:5432 -d postgres:latest
+          docker run --name super-db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=$saman77071! -e POSTGRES_DB=besicp -p 5433:5432 -d postgres:latest
           docker run -p 5005:3033 -d --name=${{secrets.CONTAINER}} ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:${{secrets.DOCKER_TAG}}
           docker logout ${{secrets.DOCKER_REPO}}
           ENDSSH
