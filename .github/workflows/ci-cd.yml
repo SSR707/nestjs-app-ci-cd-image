@@ -37,7 +37,6 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p 22 ${{ secrets.HOST }} >> ~/.ssh/known_hosts
 
-
       - name: Deploy to server
         run: |
           ssh -v -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} <<'ENDSSH'
@@ -48,7 +47,7 @@ jobs:
           docker rm ${{secrets.CONTAINER}}
           docker rm super-db 
           docker network create super-net
-          docker run --name super-db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=saman77071! -e POSTGRES_DB=besicp -p 5433:5432 -d postgres:latest
-          docker run -p 5005:3033 -d --name=${{secrets.CONTAINER}} ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:${{secrets.DOCKER_TAG}}
+          docker run --name super-db --network super-net -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=saman77071! -e POSTGRES_DB=besicp -p 5433:5432 -d postgres:latest
+          docker run --network super-net -p 5005:3033 -d --name=${{secrets.CONTAINER}} ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:${{secrets.DOCKER_TAG}}
           docker logout ${{secrets.DOCKER_REPO}}
           ENDSSH
