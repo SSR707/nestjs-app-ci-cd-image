@@ -17,7 +17,7 @@ async function bootstrap() {
       },
       'access-token',
     )
-    .setDescription('The Auth app deploy docekr images')
+    .setDescription('The Auth app deploy docekr images ')
     .setVersion('1.0')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
