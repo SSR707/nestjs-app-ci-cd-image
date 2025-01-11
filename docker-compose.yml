@@ -1,0 +1,36 @@
+services:
+  super-app-nestjs:
+    build: .
+    container_name: nest-js-super-app-image
+    ports:
+      - '5005:3033'
+    env_file:
+      - .env
+    depends_on:
+      - super-db-nestjs
+    networks:
+      - super-net
+    volumes:
+      - .:/usr/src/app 
+      - /usr/src/app/node_modules
+    command: npm run start:dev
+  super-db-nestjs:
+    image: postgres
+    container_name: nest-js-super-db-image
+    environment: 
+      POSTGRES_USER: ${PG_USER} 
+      POSTGRES_PASSWORD: ${PG_PASSWORD} 
+      POSTGRES_HOST: ${PG_HOST} 
+      POSTGRES_PORT: ${PG_PORT} 
+      POSTGRES_DATABASE: ${PG_DATABASE}
+    ports:
+      - '5433:5432'
+    networks:
+      - super-net
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  postgres_data:
+networks:
+  super-net:
+    driver: bridge
