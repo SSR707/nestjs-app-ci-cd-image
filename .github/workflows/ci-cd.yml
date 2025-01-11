@@ -44,6 +44,5 @@ jobs:
           docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:${{secrets.DOCKER_TAG}}
           docker-compose down
           docker-compose up --build -d
-
           docker logout ${{secrets.DOCKER_REPO}}
           ENDSSH
