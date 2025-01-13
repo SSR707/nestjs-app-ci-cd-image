@@ -1,6 +1,6 @@
 services:
   nestjs-ci-cd-image-cl:
-    image: "${DOCKER_USERNAME}/${DOCKER_REPO}:${DOCKER_TAG}"
+    image: "ssr07/nestjs-app-ci-cd-image-cl:latest"
     build: .
     container_name: nestjs-ci-cd-image-cl
     ports:
@@ -19,9 +19,11 @@ services:
     image: postgres
     container_name: nest-js-super-db-image
     environment:
-      POSTGRES_USER: ${PG_USER}
-      POSTGRES_PASSWORD: ${PG_PASSWORD}
-      POSTGRES_DATABASE: ${PG_DATABASE}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: saman77071!
+      POSTGRES_HOST: super-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DATABASE:  nestbesicapp
     ports:
       - '5433:5432'
     networks:
