@@ -49,6 +49,7 @@ jobs:
           docker network create super-net || true
           docker run --name super-db --network super-net -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=saman77071! -e POSTGRES_DB=besicp -p 5433:5432 -d postgres:latest
           docker run --network super-net -p 5005:3033 -d --name=${{secrets.CONTAINER}} ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:${{secrets.DOCKER_TAG}}
+
           docker logout ${{secrets.DOCKER_REPO}}
           ENDSSH
           
