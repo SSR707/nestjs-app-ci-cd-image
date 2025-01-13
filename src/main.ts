@@ -7,7 +7,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   const config = new DocumentBuilder()
     .setTitle('Project')
-    
+
     .addBearerAuth(
       {
         type: 'http',
@@ -27,6 +27,6 @@ async function bootstrap() {
       security: [{ 'access-token': [] }],
     },
   });
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3033);
 }
 bootstrap();

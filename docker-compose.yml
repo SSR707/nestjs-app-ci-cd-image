@@ -8,8 +8,6 @@ services:
       - .env
     depends_on:
       - super-db-nestjs
-    networks:
-      - super-net
     volumes:
       - .:/usr/src/app 
       - /usr/src/app/node_modules
@@ -25,13 +23,9 @@ services:
       POSTGRES_DATABASE: ${PG_DATABASE}
     ports:
       - '5433:5432'
-    networks:
-      - super-net
     volumes:
       - postgres_data:/var/lib/postgresql/data
 volumes:
   postgres_data:
-networks:
-  super-net:
-    driver: bridge
+
 
