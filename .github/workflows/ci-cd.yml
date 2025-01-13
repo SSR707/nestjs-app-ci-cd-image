@@ -36,11 +36,17 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p 22 ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+      - name: Copy necessary files to server
+        run: |
+          scp .env ${{ secrets.USER }}@${{ secrets.HOST }}:/root/nest-js-auth-app/.env
+          scp docker-compose.yml ${{ secrets.USER }}@${{ secrets.HOST }}:/root/nest-js-auth-app/docker-compose.yml
+
 
       - name: Deploy to server
         run: |
           ssh -v -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} <<'ENDSSH'
           docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_TOKEN}}
+          cd nest-js-auth-app/
           docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:${{secrets.DOCKER_TAG}}
           cat > docker-compose.yml <<EOF
           version: "3.9"
