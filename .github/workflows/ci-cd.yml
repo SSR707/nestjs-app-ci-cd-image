@@ -51,3 +51,4 @@ jobs:
           docker run --network super-net -p 5005:3033 -d --name=${{secrets.CONTAINER}} ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:${{secrets.DOCKER_TAG}}
           docker logout ${{secrets.DOCKER_REPO}}
           ENDSSH
+          
