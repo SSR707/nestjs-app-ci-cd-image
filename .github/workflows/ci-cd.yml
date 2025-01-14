@@ -39,13 +39,14 @@ jobs:
 
       - name: Copy application files to server
         run: |
+          mkdir -p /home/${{ secrets.USER }}/nest-js-auth-app
           scp -o StrictHostKeyChecking=no -r . ${{ secrets.USER }}@${{ secrets.HOST }}:/home/${{ secrets.USER }}/nest-js-auth-app
 
       - name: Deploy to server
         run: |
           ssh -v -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} <<'ENDSSH'
           docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_TOKEN}}
-          cd nest-js-auth-app/
+          cd /home/${{ secrets.USER }}/nest-js-auth-app
           scp -r . ${{ secrets.USER }}@${{ secrets.HOST }}:/${{ secrets.USER }}/nest-js-auth-app
           docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:${{secrets.DOCKER_TAG}}
           cat > docker-compose.yml <<EOF
