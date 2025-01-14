@@ -39,6 +39,7 @@ jobs:
 
       - name: Deploy to server
         run: |
+        
           ssh -v -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} <<'ENDSSH'
           docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_TOKEN}}
           mkdir -p /home/${{ secrets.USER }}/nest-js-auth-app
