@@ -44,6 +44,8 @@ jobs:
           docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_TOKEN}}
           git clone https://github.com/SSR707/nestjs-app-ci-cd-image.git
           cd nestjs-app-ci-cd-image
+          npm install
+          npx pnpm i
           cat > .env <<EOF
           PORT=3033
           NODE_ENV=development
