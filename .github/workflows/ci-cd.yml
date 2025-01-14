@@ -2,29 +2,32 @@ name: Node.js CD
 
 on:
   push:
-    branches: ['main']
+    branches: ['main'] 
   pull_request:
-    branches: ['main']
+    branches: ['main'] 
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest 
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [18.x, 20.x, 22.x] 
 
     steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }} - ${{secrets.HOST}}
+      - uses: actions/checkout@v4 
+
+      - name: Use Node.js ${{ matrix.node-version }} - ${{ secrets.HOST }}
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-      - run: npm install
+          node-version: ${{ matrix.node-version }} 
+
+      - run: npm install 
 
   deploy:
-    runs-on: ubuntu-latest
-    needs: build
+    runs-on: ubuntu-latest 
+    needs: build 
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -32,48 +35,52 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -p 22 ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa # SSH kalitni yaratish.
+          chmod 600 ~/.ssh/id_rsa # Kalit uchun ruxsatlarni sozlash.
+          ssh-keyscan -p 22 ${{ secrets.HOST }} >> ~/.ssh/known_hosts 
 
       - name: Deploy to server
         run: |
           ssh -v -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} <<'ENDSSH'
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
-          git clone https://github.com/SSR707/nestjs-app-ci-cd-image.git
-          cd nestjs-app-ci-cd-image
-          npm install  # Using npm to install dependencies
-          cat > .env <<EOF
-          PORT=3033
-          NODE_ENV=development
-          
-          DOCKER_USERNAME=ssr07
-          DOCKER_REPO=nestjs-app-ci-cd-image-cl
-          DOCKER_TAG=latest
-          CONTAINER=nestjs-ci-cd-image-cl
-
-          # POSTGRES
-          PG_USER=postgres
-          PG_PASSWORD=saman77071!
-          PG_HOST=super-db-nestjs
-          PG_PORT=5432
-          PG_DATABASE=besicp
-
-          # JSON WEB TOKEN
-          JWT_REFRESH_SECRET=qwert
-          JWT_REFRESH_EXPIRES_IN=30d
-
-          JWT_ACCESS_SECRET=12345
-          JWT_ACCESS_EXPIRES_IN=1h
-
-          # GOOGLE APP PASSWORD
-          SMTP_HOST=smtp.gmail.com
-          SMTP_PORT=587
-          USER_MAIL=samandarshavkatov07@gmail.com
-          USER_MAIL_PASSWORD=aggl bsvz rhdx taxr
+          docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_TOKEN}}
+          cd nest-js-auth-app
+          cat > docker-compose.yml <<EOF
+          version: "3.9"
+          services:
+            nestjs-app:
+              image: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:${{ secrets.DOCKER_TAG }}
+              container_name: ${{ secrets.CONTAINER }}
+              ports:
+                - '5055:3033'
+              env_file:
+                - .env
+              networks:
+                - app-network
+              volumes:
+                - .:/usr/src/app
+                - /usr/src/app/node_modules
+              command: npm run start:dev
+            database:
+              image: postgres
+              container_name: nest-js-super-db-image
+              environment:
+                POSTGRES_USER: postgres
+                POSTGRES_PASSWORD: saman77071!
+                POSTGRES_DB: nestbesicapp
+              ports:
+                - '5433:5432'
+              networks:
+                - app-network
+              volumes:
+                - postgres_data:/var/lib/postgresql/data
+          volumes:
+            postgres_data:
+          networks:
+            app-network:
+              driver: bridge
           EOF
-          docker-compose down || true
-          docker-compose up -d
-          cd ..
-          rm -rf nestjs-app-ci-cd-image
+
+          docker-compose down || true 
+          docker-compose up 
+          docker logout
           ENDSSH
