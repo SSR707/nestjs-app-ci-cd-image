@@ -1,7 +1,11 @@
+version: '3.8'
+
 services:
   nestjs-ci-cd-image-cl:
-    image: "ssr07/nestjs-app-ci-cd-image-cl:latest"
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: "nestjs-app-ci-cd-cl:latest"
     container_name: nestjs-ci-cd-image-cl
     ports:
       - '5055:3033'
@@ -15,23 +19,26 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     command: npm run start:dev
+
   super-db-nestjs:
-    image: postgres
+    image: postgres:alpine
     container_name: nest-js-super-db-image
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: saman77071!
-      POSTGRES_HOST: super-db
+      POSTGRES_HOST: super-db-nestjs
       POSTGRES_PORT: 5432
-      POSTGRES_DATABASE:  nestbesicapp
+      POSTGRES_DATABASE: nestbesicapp
     ports:
       - '5433:5432'
     networks:
       - super-net
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
 volumes:
   postgres_data:
+
 networks:
   super-net:
     driver: bridge
