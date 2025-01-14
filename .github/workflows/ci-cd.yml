@@ -38,7 +38,7 @@ jobs:
           ssh-keyscan -p 22 ${{ secrets.HOST }} >> ~/.ssh/known_host
       - name: Deploy files to server
         run: |
-          scp -r . ${{ secrets.USER }}@${{ secrets.HOST }}:/home/${{ secrets.USER }}/nest-js-auth-app
+          scp -r . ${{ secrets.USER }}@${{ secrets.HOST }}:/${{ secrets.USER }}/nest-js-auth-app
 
       - name: Deploy to server
         run: |
