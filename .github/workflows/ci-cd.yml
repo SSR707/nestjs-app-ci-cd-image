@@ -42,7 +42,7 @@ jobs:
           ssh -v -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} <<'ENDSSH'
           docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_TOKEN}}
           mkdir -p /home/${{ secrets.USER }}/nest-js-auth-app
-          scp -r . ${{ secrets.USER }}@${{ secrets.HOST }}:/home/${{ secrets.USER }}/nest-js-auth-app
+          rsync -av --exclude='*.sock' . ${{ secrets.USER }}@${{ secrets.HOST }}:/home/${{ secrets.USER }}/nest-js-auth-app
           docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:${{secrets.DOCKER_TAG}}
           cat > /home/${{ secrets.USER }}/nest-js-auth-app/docker-compose.yml <<EOF
           version: "3.9"
