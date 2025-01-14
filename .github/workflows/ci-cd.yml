@@ -79,7 +79,7 @@ jobs:
             app-network:
               driver: bridge
           EOF
-
+          
           docker-compose down || true 
           docker-compose up 
           docker logout
