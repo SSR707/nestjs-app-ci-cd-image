@@ -39,51 +39,45 @@ jobs:
 
       - name: Deploy to server
         run: |
-        
+
           ssh -v -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} <<'ENDSSH'
           docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_TOKEN}}
-          mkdir -p /home/${{ secrets.USER }}/nest-js-auth-app
-          rsync -av --exclude='*.sock' . ${{ secrets.USER }}@${{ secrets.HOST }}:/home/${{ secrets.USER }}/nest-js-auth-app
-          docker pull ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REPO}}:${{secrets.DOCKER_TAG}}
-          cat > /home/${{ secrets.USER }}/nest-js-auth-app/docker-compose.yml <<EOF
-          version: "3.9"
-          services:
-            nestjs-ci-cd-image-cl:
-              image: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:${{ secrets.DOCKER_TAG }}
-              build: .
-              container_name: ${{ secrets.CONTAINER }}
-              ports:
-                - '5055:3033'
-              env_file:
-                - .env
-              depends_on:
-                - super-db-nestjs
-              networks:
-                - super-net
-              volumes:
-                - .:/usr/src/app
-                - /usr/src/app/node_modules
-              command: npm run start:dev
-            super-db-nestjs:
-              image: postgres
-              container_name: nest-js-super-db-image
-              environment:
-                POSTGRES_USER: postgres
-                POSTGRES_PASSWORD: saman77071!
-                POSTGRES_DATABASE: nestbesicapp
-              ports:
-                - '5433:5432'
-              networks:
-                - super-net
-              volumes:
-                - postgres_data:/var/lib/postgresql/data
-          volumes:
-            postgres_data:
-          networks:
-            super-net:
-              driver: bridge
+          git clone https://github.com/SSR707/nestjs-app-ci-cd-image.git
+          cd nestjs-app-ci-cd-image
+          cat > .env <<EOF
+          PORT=3033
+          NODE_ENV=development
+
+
+          DOCKER_USERNAME=ssr07
+          DOCKER_REPO=nestjs-app-ci-cd-image-cl
+          DOCKER_TAG=latest
+          CONTAINER=nestjs-ci-cd-image-cl
+
+          # POSTGRES
+          PG_USER = postgres
+          PG_PASSWORD = saman77071!
+          PG_HOST = super-db-nestjs
+          PG_PORT = 5432
+          PG_DATABASE = besicp
+
+          # JSON WEB TOKEN
+          # REFRESH
+          JWT_REFRESH_SECRET=qwert
+          JWT_REFRESH_EXPIRES_IN=30d
+
+          # ACCESS
+          JWT_ACCESS_SECRET=12345
+          JWT_ACCESS_EXPIRES_IN=1h
+
+          # GOOGLE APP PASSWORD
+          SMTP_HOST=smtp.gmail.com
+          SMTP_PORT=587
+          USER_MAIL = samandarshavkatov07@gmail.com
+          USER_MAIL_PASSWORD = aggl bsvz rhdx taxr
           EOF
           docker-compose down || true
           docker-compose up -d
-          docker logout
+          cd .. 
+          rm -rf nestjs-app-ci-cd-image
           ENDSSH
