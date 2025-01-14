@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm i
+      - run: npm install
 
   deploy:
     runs-on: ubuntu-latest
@@ -31,55 +31,49 @@ jobs:
 
       - name: Set up SSH key
         run: |
-          env
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -p 22 ${{ secrets.HOST }} >> ~/.ssh/known_host
+          ssh-keyscan -p 22 ${{ secrets.HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to server
         run: |
-
           ssh -v -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} <<'ENDSSH'
-          docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_TOKEN}}
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
           git clone https://github.com/SSR707/nestjs-app-ci-cd-image.git
           cd nestjs-app-ci-cd-image
-          npm install
-          npx pnpm i
+          npm install  # Using npm to install dependencies
           cat > .env <<EOF
           PORT=3033
           NODE_ENV=development
-
-
+          
           DOCKER_USERNAME=ssr07
           DOCKER_REPO=nestjs-app-ci-cd-image-cl
           DOCKER_TAG=latest
           CONTAINER=nestjs-ci-cd-image-cl
 
           # POSTGRES
-          PG_USER = postgres
-          PG_PASSWORD = saman77071!
-          PG_HOST = super-db-nestjs
-          PG_PORT = 5432
-          PG_DATABASE = besicp
+          PG_USER=postgres
+          PG_PASSWORD=saman77071!
+          PG_HOST=super-db-nestjs
+          PG_PORT=5432
+          PG_DATABASE=besicp
 
           # JSON WEB TOKEN
-          # REFRESH
           JWT_REFRESH_SECRET=qwert
           JWT_REFRESH_EXPIRES_IN=30d
 
-          # ACCESS
           JWT_ACCESS_SECRET=12345
           JWT_ACCESS_EXPIRES_IN=1h
 
           # GOOGLE APP PASSWORD
           SMTP_HOST=smtp.gmail.com
           SMTP_PORT=587
-          USER_MAIL = samandarshavkatov07@gmail.com
-          USER_MAIL_PASSWORD = aggl bsvz rhdx taxr
+          USER_MAIL=samandarshavkatov07@gmail.com
+          USER_MAIL_PASSWORD=aggl bsvz rhdx taxr
           EOF
           docker-compose down || true
           docker-compose up -d
-          cd .. 
+          cd ..
           rm -rf nestjs-app-ci-cd-image
           ENDSSH
